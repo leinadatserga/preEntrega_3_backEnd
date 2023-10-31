@@ -140,7 +140,7 @@ export const postPurchase = async ( req, res ) => {
                     totalPrice = totalPrice + parcialPrice;
                     (async()=> await prodModel.findByIdAndUpdate ( prod.id_prod, { stock: updatedStock }))();
                 } else {
-                    console.log("Stock insuficiente");
+                    console.log("Out of stock");
                 }
             })
             const newTicket = await ticketModel.create({ code: uCode (), purchase_datetime: datetime, amount: totalPrice, purchaser: req.user.email });
@@ -152,4 +152,4 @@ export const postPurchase = async ( req, res ) => {
     } catch (error) {
         return res.status ( 500 ).send ({ error: `Error generating ticket: ${ error }`});
     }
-}
+};
