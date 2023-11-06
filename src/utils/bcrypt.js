@@ -1,4 +1,4 @@
-import config from "../../config.js";
+import config from "../config/config.js";
 import bcrypt from "bcrypt";
 
 export const createHash = ( password ) => bcrypt.hashSync ( password, bcrypt.genSaltSync ( parseInt ( config.salt )))

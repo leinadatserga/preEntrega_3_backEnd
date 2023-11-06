@@ -1,8 +1,9 @@
 import dotenv from "dotenv";
 
-const enviroment = "development";
+const NODE_ENV = process.env.NODE_ENV || "development";
+const dotenvPath = `./.env.${NODE_ENV}`;
 dotenv.config ({
-    path: enviroment === "development" ? "./.env.development" : "./.env.production"
+    path: dotenvPath
 });
 
 export default {
@@ -15,5 +16,11 @@ export default {
     clientSecret: process.env.CLIENT_SECRET,
     callBackURL: process.env.CALLBACK_URL,
     JWTSecret: process.env.JWT_SECRET,
-    emailPassword: process.env.PASSWORD_EMAIL
+    email: {
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        user: 'leinadatserga2@gmail.com',
+        pass: process.env.PASSWORD_EMAIL
+    }
 };

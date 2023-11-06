@@ -1,4 +1,4 @@
-import config from "../config.js";
+import config from "./config/config.js";
 import express, { json } from 'express';
 import cookieParser from "cookie-parser";
 import { engine } from 'express-handlebars';
@@ -31,7 +31,7 @@ app.use ( session ({
     store: MongoStore.create ({
         mongoUrl: config.mongoURL,
         mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
-        ttl: 900
+        ttl: 90
     }),
     secret: config.privateSession,
     resave: true,

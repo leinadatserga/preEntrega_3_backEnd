@@ -1,4 +1,4 @@
-import config from "../../config.js";
+import config from "./config.js";
 import passport from "passport";
 import local from "passport-local";
 import GithubStrategy from "passport-github2";

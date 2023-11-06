@@ -1,4 +1,4 @@
-import config from "../config.js"
+import config from "./config/config.js"
 import express from 'express'
 import nodemailer from 'nodemailer'
 import { __dirname } from "./path.js"
@@ -6,15 +6,15 @@ import { __dirname } from "./path.js"
 const app = express()
 
 let transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
+    host: config.email.host,
+    port: config.email.port,
+    secure: config.email.secure,
     auth: {
-        user: 'leinadatserga2@gmail.com',
+        user: config.email.user,
         pass: config.emailPassword,
         authMethod: 'LOGIN'
     }
-})
+});
 
 app.get('/mail', async (req, res) => {
     const resultado = await transporter.sendMail({

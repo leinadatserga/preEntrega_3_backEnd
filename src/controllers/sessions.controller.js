@@ -1,16 +1,15 @@
 import { generateToken } from '../utils/jwt.js';
 
+const sessionUser = (req) => {
+    const { first_name, last_name, email, age } = req.user;
+    req.session.user = { first_name, last_name, email, age };
+}
 export const postSession = async ( req, res ) => {
     try {
         if ( !req.user ) {
             return res.status ( 401 ).send ({ error: "Invalid user" });
         }
-        req.session.user = {
-            first_name: req.user.first_name,
-            last_name: req.user.last_name,
-            email: req.user.email,
-            age: req.user.age
-        }
+        sessionUser();
         const token = generateToken ( req.user );
         res.cookie ( "jwtCookie", token, {
             maxAge: 43200000
@@ -21,12 +20,7 @@ export const postSession = async ( req, res ) => {
     }
 };
 export const getJWT = async ( req, res ) => {
-    req.session.user = {
-        first_name: req.user.user.first_name,
-        last_name: req.user.user.last_name,
-        email: req.user.user.email,
-        age: req.user.user.age
-    }
+    sessionUser();
     return res.status ( 200 ).send ( req.user ); 
 };
 export const getCurrent = async ( req, res ) => {
