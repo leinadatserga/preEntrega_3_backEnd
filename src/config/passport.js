@@ -5,6 +5,9 @@ import GithubStrategy from "passport-github2";
 import jwt from "passport-jwt";
 import { createHash, validatePassword } from "../utils/bcrypt.js";
 import userModel from "../models/users.models.js";
+import CustomError from "../services/errors/CustomError.js";
+import EErrors from "../services/errors/enums.js";
+import { generateUserErrorInfo } from "../services/errors/info.js";
 
 const LocalStrategy = local.Strategy;
 const JWTStrategy = jwt.Strategy;
@@ -27,6 +30,14 @@ const initializePassport = () => {
     passport.use ( "register", new LocalStrategy ( 
         { passReqToCallback: true, usernameField: "email" }, async ( req, username, password, done ) => {
             const { first_name, last_name, email, age } = req.body;
+            if ( !first_name || !last_name || !email || age < 18 ) {
+                CustomError.createError ({
+                    name: "User handler error",
+                    cause: generateUserErrorInfo ({ first_name, last_name, email, age }),
+                    message: "Error in creation of new User",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })
+            }
             try {
                 const user = await userModel.findOne ({ email: username })
                 if ( user ) {

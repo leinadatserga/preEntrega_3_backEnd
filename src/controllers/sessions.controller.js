@@ -9,7 +9,7 @@ export const postSession = async ( req, res ) => {
         if ( !req.user ) {
             return res.status ( 401 ).send ({ error: "Invalid user" });
         }
-        sessionUser();
+        sessionUser(req);
         const token = generateToken ( req.user );
         res.cookie ( "jwtCookie", token, {
             maxAge: 43200000
@@ -20,7 +20,7 @@ export const postSession = async ( req, res ) => {
     }
 };
 export const getJWT = async ( req, res ) => {
-    sessionUser();
+    sessionUser(req);
     return res.status ( 200 ).send ( req.user ); 
 };
 export const getCurrent = async ( req, res ) => {

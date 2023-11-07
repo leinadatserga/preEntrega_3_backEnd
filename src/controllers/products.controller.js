@@ -1,4 +1,8 @@
 import prodModel from "../models/products.models.js";
+import { randomProducts } from "../utils/mockprods.js";
+import CustomError from "../services/errors/CustomError.js";
+import EErrors from "../services/errors/enums.js";
+import { generateProductErrorInfo } from "../services/errors/info.js";
 
 export const getProducts = async ( req, res ) => {
     const { limit, page, query, sort } = req.query;
@@ -33,6 +37,14 @@ export const getProduct = async ( req, res ) => {
 };
 export const postProduct = async ( req, res ) => {
     const { title, description, code, price, status, stock, category, thumbnails } = req.body;
+    if ( !title || !price || !stock || !category ) {
+        CustomError.createError ({
+            name: "Product handler error",
+            cause: generateProductErrorInfo ({ title, price, stock, category }),
+            message: "Error in creation of new Product",
+            code: EErrors.INVALID_TYPES_ERROR
+        })
+    }
     try {
         const newProduct = await prodModel.create ({ title, description, code, price, status, stock, category, thumbnails });
         if ( newProduct ) {
@@ -70,5 +82,16 @@ export const deleteProduct = async ( req, res ) => {
          return res.status ( 404 ).send ({ result: "Not found" });
     } catch (error) {
         return res.status ( 500 ).send ({ error: `Error deleting product: ${ error }` });
+    }
+};
+export const getMockingProducts = async ( req, res ) => {
+    try {
+        const mockingsProducts = randomProducts(100);
+        if ( mockingsProducts ) {
+            return res.status ( 200 ).send ( mockingsProducts );
+        }
+        return res.status ( 404 ).send ({ error: "Not found" }); 
+    } catch (error) {
+        return res.status ( 500 ).send ({ error: `Error when consulting products: ${ error }`});  
     }
 };
