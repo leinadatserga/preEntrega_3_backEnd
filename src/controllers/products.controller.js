@@ -1,8 +1,7 @@
 import prodModel from "../models/products.models.js";
 import { randomProducts } from "../utils/mockprods.js";
 import CustomError from "../services/errors/CustomError.js";
-import EErrors from "../services/errors/enums.js";
-import { generateProductErrorInfo } from "../services/errors/info.js";
+import { productValidation } from "../middlewares/joiValidation.js";
 
 export const getProducts = async ( req, res ) => {
     const { limit, page, query, sort } = req.query;
@@ -20,7 +19,7 @@ export const getProducts = async ( req, res ) => {
             return res.status ( 200 ).send ( products );
         }
     } catch (error) {
-        return res.status ( 500 ).send ({ error: `Error when consulting products: ${ error }`});  
+        return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` );  
     }
 };
 export const getProduct = async ( req, res ) => {
@@ -30,32 +29,30 @@ export const getProduct = async ( req, res ) => {
         if ( product ) {
             return res.status ( 200 ).send ( product );
         }
-        return res.status ( 404 ).send ({ error: "Not found" }); 
+        return res.status ( 404 ).send ( `${ CustomError.NotFound ()}` )
     } catch (error) {
-        return res.status ( 500 ).send ({ error: `Error when consulting products: ${ error }`});  
+        return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` );  
     }
 };
 export const postProduct = async ( req, res ) => {
     const { title, description, code, price, status, stock, category, thumbnails } = req.body;
-    if ( !title || !price || !stock || !category ) {
-        CustomError.createError ({
-            name: "Product handler error",
-            cause: generateProductErrorInfo ({ title, price, stock, category }),
-            message: "Error in creation of new Product",
-            code: EErrors.INVALID_TYPES_ERROR
-        })
-    }
+    const validProd = productValidation ( req.body );
+    const existProd = await prodModel.findOne ({ code: code });
+    
     try {
+        if ( validProd.error || existProd ) {
+        throw Error
+        }
         const newProduct = await prodModel.create ({ title, description, code, price, status, stock, category, thumbnails });
         if ( newProduct ) {
             return res.status ( 201 ).send ( newProduct );
         }
-        return res.status ( 404 ).send ({ error: "Not found" });
+        return res.status ( 404 ).send ( `${ CustomError.NotFound ()}` );
     } catch (error) {
         if ( error.code == 11000 ) {
-            return res.status ( 400 ).send ({ error: "Duplicated code" });
+            return res.status ( 400 ).send ( `${ CustomError.BadRequest ()}` );
         } else {
-            return res.status ( 500 ).send ({ error: `Error creating product: ${ error }` });
+            return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` );
         }
     }
 };
@@ -67,9 +64,9 @@ export const putProduct = async ( req, res ) => {
         if ( updatedProduct ) {
             return res.status ( 200 ).send ( updatedProduct );
         }
-        return res.status ( 404 ).send ({ error: "Not found" }); 
+        return res.status ( 404 ).send ( `${ CustomError.NotFound ()}` ); 
     } catch (error) {
-        return res.status ( 500 ).send ({ error: `Error updating product: ${ error }` });
+        return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` );
     }
 };
 export const deleteProduct = async ( req, res ) => {
@@ -79,9 +76,9 @@ export const deleteProduct = async ( req, res ) => {
         if ( deletedProduct ) {
             return res.status ( 200 ).send ( deletedProduct );
          }
-         return res.status ( 404 ).send ({ result: "Not found" });
+         return res.status ( 404 ).send ( `${ CustomError.NotFound ()}` );
     } catch (error) {
-        return res.status ( 500 ).send ({ error: `Error deleting product: ${ error }` });
+        return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` );
     }
 };
 export const getMockingProducts = async ( req, res ) => {
@@ -90,8 +87,8 @@ export const getMockingProducts = async ( req, res ) => {
         if ( mockingsProducts ) {
             return res.status ( 200 ).send ( mockingsProducts );
         }
-        return res.status ( 404 ).send ({ error: "Not found" }); 
+        return res.status ( 404 ).send ( `${ CustomError.NotFound ()}` ); 
     } catch (error) {
-        return res.status ( 500 ).send ({ error: `Error when consulting products: ${ error }`});  
+        return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` );  
     }
 };

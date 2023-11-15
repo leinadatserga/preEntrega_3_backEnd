@@ -8,6 +8,7 @@ dotenv.config ({
 
 export default {
     port: process.env.PORT,
+    host: process.env.HOST,
     mongoURL: process.env.MONGO_URL,
     privateSession: process.env.PRIVATE_SESSION,
     salt: process.env.SALT,
@@ -22,5 +23,6 @@ export default {
         secure: true,
         user: 'leinadatserga2@gmail.com',
         pass: process.env.PASSWORD_EMAIL
-    }
+    },
+    environment: process.env.TEST_ENVIRONMENT
 };

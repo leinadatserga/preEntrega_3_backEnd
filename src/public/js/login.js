@@ -1,4 +1,5 @@
 const socket = io ();
+import logger from "../../utils/logger";
 
 
 const formLogin = document.getElementById ( "loginForm" );
@@ -10,9 +11,9 @@ formLogin.addEventListener ( "submit", ( e ) => {
     e.target.reset ();
     socket.on ( "conf", ( confirm ) => {
         if ( confirm ) {
-            console.log( "User OK" );
+            logger.debug( "User OK" );
         } else {
-            console.log( "User data error" );
+            logger.debug( "User data error" );
         }
     })
 });

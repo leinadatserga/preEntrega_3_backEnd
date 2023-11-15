@@ -3,6 +3,9 @@ import ticketModel from '../models/ticket.models.js';
 import prodModel from '../models/products.models.js';
 import { uCode } from '../utils/uuid.js';
 import { datetime } from '../utils/datetime.js';
+import logger from '../utils/logger.js';
+import CustomError from '../services/errors/CustomError.js';
+
 
 
 export const getCarts = async ( req, res ) => {
@@ -10,7 +13,7 @@ export const getCarts = async ( req, res ) => {
         const carts = await cartModel.find ();
         return res.status ( 200 ).send ( carts );  
     } catch (error) {
-        return res.status ( 500 ).send ({ error: `Error getting carts: ${ error }`});
+        return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` );
     }
 };
 export const getCart = async ( req, res ) => {
@@ -21,9 +24,9 @@ export const getCart = async ( req, res ) => {
             const cartProdRef = await cartModel.findOne ({ _id: cid }).populate ( "products.id_prod" );
             return res.status ( 200 ).send ( cartProdRef );
         }
-        return res.status ( 404 ).send ({ error: "Not found" });
+        return res.status ( 404 ).send ( `${ CustomError.NotFound ()}` );
     } catch (error) {
-        return res.status ( 500 ).send ({ error: `Error getting cart: ${ error }`});
+        return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` );
     }
 };
 export const postCart = async ( req, res ) => {
@@ -31,7 +34,7 @@ export const postCart = async ( req, res ) => {
         const newCart = await cartModel.create ({});
         return res.status ( 201 ).send ( newCart ); 
     } catch (error) {
-      return res.status ( 500 ).send ({ error: `Error creating cart: ${ error }` });  
+      return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` );  
     }
 };
 export const postProdCart = async ( req, res ) => {
@@ -40,7 +43,7 @@ export const postProdCart = async ( req, res ) => {
     try {
         let quant;
         const cartFind = await cartModel.findById ( cid );
-        if ( !cartFind ) res.status ( 404 ).send ({ result: "Not found" });
+        if ( !cartFind ) res.status ( 404 ).send ( `${ CustomError.NotFound ()}` );
         const indexProd = cartFind.products.findIndex ( prod => prod.id_prod == pid );
         if ( indexProd != -1 ) {
             quant = cartFind.products [ indexProd ].quantity + quantity;
@@ -52,7 +55,7 @@ export const postProdCart = async ( req, res ) => {
             }
         return res.status ( 200 ).send ( cartFind );
     } catch (error) {
-        return res.status ( 500 ).send ({ error: `Error adding products to cart: ${ error }` });
+        return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` );
     }
 };
 export const putProdCart = async ( req, res ) => {
@@ -68,9 +71,9 @@ export const putProdCart = async ( req, res ) => {
             await cartModel.findByIdAndUpdate ( cid, cart );
             return res.status ( 200 ).send ( cart );
         }
-        return res.status ( 404 ).send ({ error: "Not found" });
+        return res.status ( 404 ).send ( `${ CustomError.NotFound ()}` );
     } catch (error) {
-        return res.status ( 500 ).send ({ error: `Error updating cart: ${ error }` });
+        return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` );
     }
 };
 export const putProdsCart = async ( req, res ) => {
@@ -92,7 +95,7 @@ export const putProdsCart = async ( req, res ) => {
         });
         return res.status ( 200 ).send ( cartFind );
     } catch (error) {
-        return res.status ( 500 ).send ({ error: `Error updating cart: ${ error }` });
+        return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` );
     }
 };
 export const deleteProdCart = async ( req, res ) => {
@@ -105,9 +108,9 @@ export const deleteProdCart = async ( req, res ) => {
             await cartModel.findByIdAndUpdate ( cid, cart );
             return res.status ( 200 ).send ( cart );
         }
-        return res.status ( 404 ).send ({ error: "Not found" });
+        return res.status ( 404 ).send ( `${ CustomError.NotFound ()}` );
     } catch (error) {
-        return res.status ( 500 ).send ({ error: `Error deleting product of cart: ${ error }` });
+        return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` );
     }
 };
 export const deleteCart = async ( req, res ) => {
@@ -119,9 +122,9 @@ export const deleteCart = async ( req, res ) => {
             await cartModel.findByIdAndUpdate ( cid, deletedCart );
             return res.status ( 200 ).send ( deletedCart );
         }
-        return res.status ( 404 ).send ({ error: "Not found" });
+        return res.status ( 404 ).send ( `${ CustomError.NotFound ()}` );
     } catch (error) {
-       return res.status ( 500 ).send ({ error: `Error deleting cart: ${ error }` }); 
+       return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` ); 
     }
 };
 export const postPurchase = async ( req, res ) => {
@@ -140,7 +143,7 @@ export const postPurchase = async ( req, res ) => {
                     totalPrice = totalPrice + parcialPrice;
                     (async()=> await prodModel.findByIdAndUpdate ( prod.id_prod, { stock: updatedStock }))();
                 } else {
-                    console.log("Out of stock");
+                    logger.debug("Out of stock");
                 }
             })
             const newTicket = await ticketModel.create({ code: uCode (), purchase_datetime: datetime, amount: totalPrice, purchaser: req.user.email });
@@ -148,8 +151,9 @@ export const postPurchase = async ( req, res ) => {
             await cartModel.findByIdAndUpdate ( cid, cart );
             return res.status ( 200 ).send ( newTicket, cart );
         }
-        return res.status ( 404 ).send ({ error: "Not found or invalid user" }); 
+        logger.error ( `[ ERROR / CARTS / PURCHASE ] [ ${ datetime } ] Ha ocurrido un error: "Not found or invalid user"` )
+        return res.status ( 404 ).send ( `${ CustomError.NotFound ()}` ); 
     } catch (error) {
-        return res.status ( 500 ).send ({ error: `Error generating ticket: ${ error }`});
+        return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` );
     }
 };

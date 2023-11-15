@@ -2,6 +2,7 @@ import config from "./config/config.js"
 import express from 'express'
 import nodemailer from 'nodemailer'
 import { __dirname } from "./path.js"
+import logger from "./utils/logger.js"
 
 const app = express()
 
@@ -35,9 +36,9 @@ app.get('/mail', async (req, res) => {
         }
         ]
     })
-    console.log(resultado)
+    logger.debug(resultado)
     res.send('Mail enviado')
 })
 app.listen(4000, () => {
-    console.log("Server on port 4000")
+    logger.debug("Server on port 4000")
 })

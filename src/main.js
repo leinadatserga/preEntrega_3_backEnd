@@ -11,18 +11,20 @@ import session from "express-session";
 import MongoStore from "connect-mongo";
 import initializePassport from "./config/passport.js";
 import passport from "passport";
+import logger from "./utils/logger.js";
 
 const PORT = config.port;
+const HOST = config.host;
 const app = express ();
-const server = app.listen ( PORT, () => {
-    console.log ( `Server port: ${ PORT }` );
+const server = app.listen ( PORT, HOST, () => {
+    logger.http ( `Server host: ${ HOST } / port: ${ PORT }` );
 });
-
+logger.http ( `[ SYSTEM INFORMATION: ] [ ${ new Date ().toLocaleString () } ] Server initiated in ${ config.environment } environment mode.` );
 mongoose.connect ( config.mongoURL )
 .then ( async () => {
-    console.log ( "DB connected" )
+    logger.http ( `DB connected` )
 })
-.catch (( error ) => console.log ( "Failed to connect to MongoDB Atlas: ", error ));
+.catch (( error ) => logger.error ( `Failed to connect to MongoDB Atlas: ${ error }` ));
 const io = new Server ( server );
 app.use ( express.urlencoded ({ extended: true }));
 app.use ( express.json ());

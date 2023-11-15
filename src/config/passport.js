@@ -5,9 +5,8 @@ import GithubStrategy from "passport-github2";
 import jwt from "passport-jwt";
 import { createHash, validatePassword } from "../utils/bcrypt.js";
 import userModel from "../models/users.models.js";
-import CustomError from "../services/errors/CustomError.js";
-import EErrors from "../services/errors/enums.js";
-import { generateUserErrorInfo } from "../services/errors/info.js";
+import logger from "../utils/logger.js";
+import { userValidation } from "../middlewares/joiValidation.js";
 
 const LocalStrategy = local.Strategy;
 const JWTStrategy = jwt.Strategy;
@@ -30,17 +29,10 @@ const initializePassport = () => {
     passport.use ( "register", new LocalStrategy ( 
         { passReqToCallback: true, usernameField: "email" }, async ( req, username, password, done ) => {
             const { first_name, last_name, email, age } = req.body;
-            if ( !first_name || !last_name || !email || age < 18 ) {
-                CustomError.createError ({
-                    name: "User handler error",
-                    cause: generateUserErrorInfo ({ first_name, last_name, email, age }),
-                    message: "Error in creation of new User",
-                    code: EErrors.INVALID_TYPES_ERROR
-                })
-            }
+            const validUser = userValidation ( req.body );
             try {
                 const user = await userModel.findOne ({ email: username })
-                if ( user ) {
+                if ( user || validUser.error ) {
                     return done ( null, false );
                 }
                 const cryptdPassword = createHash ( password )
@@ -51,7 +43,7 @@ const initializePassport = () => {
                     age: age,
                     password: cryptdPassword
                 })
-                console.log ( newUser );
+                logger.debug ( newUser );
                 return done ( null, newUser )
             } catch (error) {
                 return done ( error )
@@ -83,8 +75,8 @@ passport.use ( "github", new GithubStrategy ({
     callbackURL: config.callBackURL
 }, async ( accessToken, refreshToken, profile, done ) => {
     try {
-        console.log(accessToken);
-        console.log(refreshToken);
+        logger.debug(accessToken);
+        logger.debug(refreshToken);
         const user = await userModel.findOne ({ email: profile._json.email });
         if ( user ) {
             done ( null, false );

@@ -1,4 +1,5 @@
 const socket = io ();
+import logger from "../../utils/logger";
 
 
 const formProduct = document.getElementById ( "productForm" );
@@ -16,7 +17,7 @@ formProduct.addEventListener ( "submit", ( e ) => {
         if ( confirm ) {
             window.location.reload ( true );
         } else {
-            console.log( "Product error" );
+            logger.debug( "Product error" );
         }
     })
 });

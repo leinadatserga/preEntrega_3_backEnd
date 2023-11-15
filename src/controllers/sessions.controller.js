@@ -1,3 +1,4 @@
+import CustomError from '../services/errors/CustomError.js';
 import { generateToken } from '../utils/jwt.js';
 
 const sessionUser = (req) => {
@@ -7,7 +8,7 @@ const sessionUser = (req) => {
 export const postSession = async ( req, res ) => {
     try {
         if ( !req.user ) {
-            return res.status ( 401 ).send ({ error: "Invalid user" });
+            return res.status ( 401 ).send ( `${ CustomError.Unauthorized ()}` );
         }
         sessionUser(req);
         const token = generateToken ( req.user );
@@ -16,7 +17,7 @@ export const postSession = async ( req, res ) => {
         })
         return res.status ( 200 ).send ( req.user );
     } catch (error) {
-        return res.status ( 500 ).send ({ error: `Error to initiate user session: ${ error }`}); 
+        return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` ); 
     }
 };
 export const getJWT = async ( req, res ) => {
