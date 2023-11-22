@@ -8,9 +8,9 @@ routerCart.get ( "/:cid", passportError ( "jwt" ), authorization ( "user" ), get
 routerCart.post ( "/", passportError ( "jwt" ), authorization ( "user" ), postCart );
 routerCart.post ( "/:cid/products/:pid", passportError ( "jwt" ), authorization ( "user" ), postProdCart );
 routerCart.put ( "/:cid/products/:pid", passportError ( "jwt" ), authorization ( "user" ), putProdCart );
-routerCart.put ( "/:cid", passportError ( "jwt" ), authorization ( "user" ), putProdsCart );
+routerCart.put ( "/:cid", passportError ( "jwt" ), authorization ( "premium" ), putProdsCart );
 routerCart.delete ( "/:cid/products/:pid", passportError ( "jwt" ), authorization ( "admin" ), deleteProdCart );
 routerCart.delete ( "/:cid", passportError ( "jwt" ), authorization ( "admin" ), deleteCart );
-routerCart.post ( "/:cid/purchase", postPurchase );
+routerCart.post ( "/:cid/purchase", passportError ( "jwt" ), authorization ([ "premium", "user" ]), postPurchase );
 
 export default routerCart;

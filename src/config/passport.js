@@ -31,22 +31,22 @@ const initializePassport = () => {
             const { first_name, last_name, email, age } = req.body;
             const validUser = userValidation ( req.body );
             try {
-                const user = await userModel.findOne ({ email: username })
+                const user = await userModel.findOne ({ email: username });
                 if ( user || validUser.error ) {
                     return done ( null, false );
                 }
-                const cryptdPassword = createHash ( password )
+                const cryptdPassword = createHash ( password );
                 const newUser = await userModel.create ({
                     first_name: first_name,
                     last_name: last_name,
                     email: email,
                     age: age,
                     password: cryptdPassword
-                })
+                });
                 logger.debug ( newUser );
-                return done ( null, newUser )
+                return done ( null, newUser );
             } catch (error) {
-                return done ( error )
+                return done ( error );
             }
         }
     ));
@@ -55,7 +55,7 @@ const initializePassport = () => {
 
     passport.use ( "login", new LocalStrategy ({ usernameField: "email" }, async ( username, password, done ) => {
         try {
-            const user = await userModel.findOne ({ email: username })
+            const user = await userModel.findOne ({ email: username });
             if ( !user ) {
                 return done ( null, false ); 
             }

@@ -31,6 +31,10 @@ const userSchema = new Schema ({
     rol: {
         type: String,
         default: "user"
+    },
+    owner: {
+        type: String,
+        default: "admin"
     }
 });
 userSchema.pre ( "save", async function ( next ) {

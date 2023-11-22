@@ -132,6 +132,7 @@ export const postPurchase = async ( req, res ) => {
     let totalPrice = 0;
     try {
         const cart = await cartModel.findById ( cid );
+        const userDat = req.user.user
         if ( cart && req.user ) {
             const cartProdRef = await cartModel.findOne ({ _id: cid }).populate ( "products.id_prod" );
             cartProdRef.products.forEach ( prod => {
@@ -146,10 +147,13 @@ export const postPurchase = async ( req, res ) => {
                     logger.debug("Out of stock");
                 }
             })
-            const newTicket = await ticketModel.create({ code: uCode (), purchase_datetime: datetime, amount: totalPrice, purchaser: req.user.email });
+            if ( userDat.rol == "premium" ) {
+                totalPrice = totalPrice * 0.9;
+            };
+            const newTicket = await ticketModel.create({ code: uCode (), purchase_datetime: datetime, amount: totalPrice, purchaser: userDat.email });
             cart.products.splice ( 0 );
             await cartModel.findByIdAndUpdate ( cid, cart );
-            return res.status ( 200 ).send ( newTicket, cart );
+            return res.status ( 200 ).send ( newTicket );
         }
         logger.error ( `[ ERROR / CARTS / PURCHASE ] [ ${ datetime } ] Ha ocurrido un error: "Not found or invalid user"` )
         return res.status ( 404 ).send ( `${ CustomError.NotFound ()}` ); 
