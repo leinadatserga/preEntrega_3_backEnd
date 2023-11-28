@@ -12,8 +12,9 @@ import MongoStore from "connect-mongo";
 import initializePassport from "./config/passport.js";
 import passport from "passport";
 import logger from "./utils/logger.js";
-import { userInfo } from "os";
-import { Session } from "inspector";
+import swaggerJSDoc from "swagger-jsdoc";
+import swaggerUiExpress from "swagger-ui-express";
+
 
 const PORT = config.port;
 const HOST = config.host;
@@ -42,6 +43,20 @@ app.use ( session ({
     saveUninitialized: true
 })
 );
+
+const swaggerOptions = {
+    definition: {
+        openapi: "3.0.1",
+        info: {
+            title: "Documentation of WebAPI - Security eCommerce project",
+            description: "Web API for Global Tech Market"
+        }
+    },
+    apis: [ `${ __dirname }/docs/**/*.yaml` ]
+};
+console.log(__dirname);
+const specifications = swaggerJSDoc ( swaggerOptions );
+
 initializePassport ();
 app.use ( passport.initialize ());
 app.use ( passport.session ());
@@ -50,4 +65,5 @@ app.set ( "view engine", "handlebars" );
 app.set ( "views", path.resolve ( __dirname, "./views" ));
 app.use ( "/static", express.static ( path.join ( __dirname, "/public" )));
 app.use ( "/", router );
+app.use ( "/apidocs", swaggerUiExpress.serve, swaggerUiExpress.setup ( specifications ) );
 

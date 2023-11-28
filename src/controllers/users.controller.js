@@ -55,11 +55,18 @@ export const sendRecoveryMail = async ( req, res ) => {
 export const verifyRecoveryLink = async ( req, res ) => {
     const { token } = req.params;
     const { password } = req.body;
-    const newPassword = createHash ( password );
     const verifiedLink = tokenLink [ token ];
+    const { email } = verifiedLink;
+    const newPassword = createHash ( password );
+    const user = await userModel.findOne ({ email: email });
+        if ( user.password == newPassword ) {
+            res.status ( 400 ).send ( `${ CustomError.BadRequest ()}` );
+        } else {
+            logger.debug ( "User finded!" );
+        }
     try {
         if ( verifiedLink && ( Date.now () - verifiedLink.timestamp ) <= 3600000 ) {
-            const { email } = verifiedLink;
+            
             const userNewPass = await userModel.findOneAndUpdate({ email: email }, { password: newPassword }, { new: true });
             delete tokenLink [ token ];
             res.status ( 200 ).send ({ message: "Recovery email verify, new password set confirmed" });

@@ -5,7 +5,7 @@ import { getProducts, getProduct, postProduct, putProduct, deleteProduct, getMoc
 const routerProd = Router ();
 routerProd.get ( "/mockingproducts", passportError ( "jwt" ), authorization ( "admin" ), getMockingProducts);
 routerProd.get ( "/", getProducts );
-routerProd.get ( "/:id", getProduct );
+routerProd.get ( "/:id", passportError ( "jwt" ), authorization ([ "admin", "premium", "user" ]), getProduct );
 routerProd.post ( "/", passportError ( "jwt" ), authorization ( "admin" ), postProduct );
 routerProd.put ( "/:id", passportError ( "jwt" ), authorization ( "admin" ), putProduct );
 routerProd.delete ( "/:id", passportError ( "jwt" ), authorization ( "admin" ), deleteProduct );

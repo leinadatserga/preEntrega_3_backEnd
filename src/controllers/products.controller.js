@@ -19,7 +19,7 @@ export const getProducts = async ( req, res ) => {
             return res.status ( 200 ).send ( products );
         }
     } catch (error) {
-        return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` );  
+        return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` );
     }
 };
 export const getProduct = async ( req, res ) => {
@@ -54,7 +54,7 @@ export const postProduct = async ( req, res ) => {
         } else {
             return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` );
         }
-    }
+    } 
 };
 export const putProduct = async ( req, res ) => {
     const { id } = req.params;
@@ -91,4 +91,4 @@ export const getMockingProducts = async ( req, res ) => {
     } catch (error) {
         return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` );  
     }
-};
+}; 
