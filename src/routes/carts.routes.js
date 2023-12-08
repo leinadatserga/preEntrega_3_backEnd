@@ -4,9 +4,9 @@ import { passportError, authorization } from '../utils/errors.js';
 
 const routerCart = Router ();
 routerCart.get ( "/", passportError ( "jwt" ), authorization ( "admin" ), getCarts );
-routerCart.get ( "/:cid", passportError ( "jwt" ), authorization ([ "premium", "user" ]), getCart );
+routerCart.get ( "/:cid", passportError ( "jwt" ), authorization ([ "premium", "user", "admin" ]), getCart );
 routerCart.post ( "/", passportError ( "jwt" ), authorization ( "admin" ), postCart );
-routerCart.post ( "/:cid/products/:pid", passportError ( "jwt" ), authorization ([ "premium", "user" ]), postProdCart );
+routerCart.post ( "/:cid/products/:pid", passportError ( "jwt" ), authorization ([ "premium", "user", "admin" ]), postProdCart );
 routerCart.put ( "/:cid/products/:pid", passportError ( "jwt" ), authorization ([ "premium", "user" ]), putProdCart );
 routerCart.put ( "/:cid", passportError ( "jwt" ), authorization ([ "premium", "user" ]), putProdsCart );
 routerCart.delete ( "/:cid/products/:pid", passportError ( "jwt" ), authorization ( "admin" ), deleteProdCart );

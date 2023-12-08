@@ -54,7 +54,6 @@ const swaggerOptions = {
     },
     apis: [ `${ __dirname }/docs/**/*.yaml` ]
 };
-console.log(__dirname);
 const specifications = swaggerJSDoc ( swaggerOptions );
 
 initializePassport ();
