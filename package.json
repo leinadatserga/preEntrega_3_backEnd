@@ -10,7 +10,7 @@
     "prod": "set NODE_ENV=production&& node src/main.js",
     "testCarts": "mocha src/test/cartsTest/Carts.test.js",
     "testChaiCarts": "mocha src/test/cartsTest/CartsChai.test.js",
-    "supertestCarts": "mocha src/test/cartsTest/CartsSupertest.test.js"
+    "supertestCarts": "mocha src/test/cartsTest/CartsSupertest.test.js --exit"
   },
   "keywords": [],
   "author": "",
