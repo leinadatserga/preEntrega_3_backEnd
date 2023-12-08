@@ -24,5 +24,8 @@ export default {
         user: 'leinadatserga2@gmail.com',
         pass: process.env.PASSWORD_EMAIL
     },
-    environment: process.env.TEST_ENVIRONMENT
+    environment: process.env.TEST_ENVIRONMENT,
+    fakeUser: process.env.FAKE_USER,
+    fakeProduct: process.env.FAKE_PRODUCT,
+    realUser: process.env.REAL_DB_USER
 };

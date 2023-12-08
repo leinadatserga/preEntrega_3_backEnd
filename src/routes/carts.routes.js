@@ -13,4 +13,4 @@ routerCart.delete ( "/:cid/products/:pid", passportError ( "jwt" ), authorizatio
 routerCart.delete ( "/:cid", passportError ( "jwt" ), authorization ( "admin" ), deleteCart );
 routerCart.post ( "/:cid/purchase", passportError ( "jwt" ), authorization ([ "premium", "user" ]), postPurchase );
 
-export default routerCart;
+export default routerCart;   

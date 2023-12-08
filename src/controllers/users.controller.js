@@ -8,6 +8,15 @@ import logger from "../utils/logger.js";
 
 
 const tokenLink = {};
+export const getUsers = async ( req, res ) => {
+    try {
+        const users = await userModel.find ();
+        return res.status ( 200 ).send ( users );
+    } catch ( error ) {
+        logger.warning ( `[ ERROR ] [ ${ new Date ().toLocaleString () } ] Ha ocurrido un error: ${ error.message }` );
+        return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` );
+    }
+};
 export const postUser = async ( req, res ) => {
     try {
         if ( !req.user ) {

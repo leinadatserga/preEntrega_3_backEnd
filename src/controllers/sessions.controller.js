@@ -25,7 +25,7 @@ export const getJWT = async ( req, res ) => {
     return res.status ( 200 ).send ( req.user ); 
 };
 export const getCurrent = async ( req, res ) => {
-    return res.send ( req.user );
+    return res.status ( 200 ).send ( req.user );
 };
 export const getGithub = async ( req, res ) => {
     return res.status ( 200 ).send ( req.user );

@@ -3,13 +3,9 @@ import CustomError from "../services/errors/CustomError.js";
 import logger from "../utils/logger.js";
 
 export const getMessages = async ( req, res ) => {
-    logger.info("a ver...");
-    logger.warning ( `Oh, oH...Ha habido un problema... [ ERROR ] [ ${ new Date ().toLocaleString () } ] Ha ocurrido un error: ${ req.info }` );
     try {
-        //throw new Error ( "Test error" );
         const messages = await messageModel.find ();
         return res.status ( 200 ).send ( messages );
-        
     } catch ( error ) {
         logger.warning ( `[ ERROR ] [ ${ new Date ().toLocaleString () } ] Ha ocurrido un error: ${ error.message }` );
         return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` );
@@ -25,7 +21,7 @@ export const getMessageByMail = async ( req, res ) => {
         } else {
             return res.status ( 404 ).send ( `${ CustomError.NotFound ()}` );
         }
-    } catch (error) {
+    } catch ( error ) {
         return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` );
     }
 };
@@ -34,7 +30,7 @@ export const postMessage = async ( req, res ) => {
     try {
         const newMessage = await messageModel.create ({ email, message });
         return res.status ( 200 ).send ( newMessage );
-    } catch (error) {
+    } catch ( error ) {
         return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` );
     }
 };
@@ -47,7 +43,7 @@ export const deleteMessage = async ( req, res ) => {
         } else {
             return res.status ( 404 ).send ( `${ CustomError.NotFound ()}` );
         }
-    } catch (error) {
+    } catch ( error ) {
         return res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` );
     }
 };
