@@ -70,7 +70,6 @@ describe ( "Integration test for e-commerce", () => {
     });
     describe ( "Carts test", () => {
         let cartId = user.cart;
-        console.log(cartId);
         it ( "Endpoint test /api/carts/:cid, expect to get a cart by the Id", async function () {
             const cart = await requester.get ( `/api/carts/${ cartId }` ).set ( "Cookie", token );
             expect ( cart.status ).to.equal ( 200 );
