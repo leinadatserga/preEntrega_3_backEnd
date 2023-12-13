@@ -7,7 +7,7 @@ routerCart.get ( "/", passportError ( "jwt" ), authorization ( "admin" ), getCar
 routerCart.get ( "/:cid", passportError ( "jwt" ), authorization ([ "premium", "user", "admin" ]), getCart );
 routerCart.post ( "/", passportError ( "jwt" ), authorization ( "admin" ), postCart );
 routerCart.post ( "/:cid/products/:pid", passportError ( "jwt" ), authorization ([ "premium", "user", "admin" ]), postProdCart );
-routerCart.put ( "/:cid/products/:pid", passportError ( "jwt" ), authorization ([ "premium", "user" ]), putProdCart );
+routerCart.put ( "/:cid/products/:pid", passportError ( "jwt" ), authorization ([ "premium", "user", "admin" ]), putProdCart );
 routerCart.put ( "/:cid", passportError ( "jwt" ), authorization ([ "premium", "user" ]), putProdsCart );
 routerCart.delete ( "/:cid/products/:pid", passportError ( "jwt" ), authorization ( "admin" ), deleteProdCart );
 routerCart.delete ( "/:cid", passportError ( "jwt" ), authorization ( "admin" ), deleteCart );

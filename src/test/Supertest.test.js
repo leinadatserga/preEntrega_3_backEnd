@@ -24,7 +24,8 @@ describe ( "Integration test for e-commerce", () => {
                 password: user.password
             }
             const session = await requester.post ( "/api/session/login" ).send ( client );
-            token = session.header["set-cookie"][0];
+            token = session.header [ "set-cookie" ] [ 0 ];
+            expect ( token ).to.be.ok;
             expect ( session.status ).to.equal ( 200 );
             expect ( session.body ).to.have.property ( "email" ).to.be.a ( "string" );
             expect ( session.body ).to.have.property ( "_id" ).to.be.a ( "string" );
@@ -51,7 +52,7 @@ describe ( "Integration test for e-commerce", () => {
             prodId = newProduct.body._id;
             prevProp = newProduct.body.title;
         });
-        it ( "Endpoint test /api/products:id, expect to update a product by the Id", async function () {
+        it ( "Endpoint test /api/products/:id, expect to update a product by the Id", async function () {
             const newValues = {
                 title: "Bala Inactivo",
                 category: "balota"
@@ -70,6 +71,7 @@ describe ( "Integration test for e-commerce", () => {
     });
     describe ( "Carts test", () => {
         let cartId = user.cart;
+        let prevCart;
         it ( "Endpoint test /api/carts/:cid, expect to get a cart by the Id", async function () {
             const cart = await requester.get ( `/api/carts/${ cartId }` ).set ( "Cookie", token );
             expect ( cart.status ).to.equal ( 200 );
@@ -78,9 +80,15 @@ describe ( "Integration test for e-commerce", () => {
         });
         it ( "Endpoint test /api/carts/:cid/products/:pid, expect to add products to a cart by respective Ids", async function () {
             const addProd = await requester.post ( `/api/carts/${ cartId }/products/651c613036dd8e4e2f64e836` ).send ({ "quantity": 2 }).set ( "Cookie", token );
+            prevCart = addProd;
             expect ( addProd.status ).to.equal ( 200 );
             expect ( addProd.body ).to.have.property ( "products" ).to.be.a ( "array" );
-            expect ( addProd.body.products ).to.be.a ( "array" );
+            expect ( addProd.body.products [ 0 ] ).to.have.property ( "quantity" ).to.be.a ( "number" );
+        });
+        it ( "Endpoint test /api/carts/:cid/products/:pid, expect to update products of a cart by respective Ids", async function () {
+            const updateProd = await requester.put ( `/api/carts/${ cartId }/products/651c613036dd8e4e2f64e836` ).send ({ "quantity": 10 }).set ( "Cookie", token );
+            expect ( updateProd.status ).to.equal ( 200 );
+            expect ( updateProd.body ).to.not.deep.equal ( prevCart.body );
         });
         it ( "Endpoint test /api/carts/:cid, expect to empty a cart by Id", async function () {
             const emptyCart = await requester.delete ( `/api/carts/${ cartId }` ).set ( "Cookie", token );
