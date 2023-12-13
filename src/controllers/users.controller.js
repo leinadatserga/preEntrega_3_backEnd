@@ -22,7 +22,20 @@ export const postUser = async ( req, res ) => {
         if ( !req.user ) {
             res.status ( 400 ).send ( `${ CustomError.BadRequest ()}` );
         }
-        res.status ( 200 ).send ({ message: "User created", user: req.user });
+        res.status ( 201 ).send ({ message: "User created", user: req.user });
+    } catch (error) {
+        res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` ); 
+    }
+};
+export const deleteUser = async ( req, res ) => {
+    const { uid } = req.params;
+    try {
+        const user = await userModel.findById ( uid );
+        if ( !user ) {
+            res.status ( 400 ).send ( `${ CustomError.BadRequest ()}` );
+        }
+        await userModel.findByIdAndDelete ( uid );
+        res.status ( 200 ).send ({ message: "User deleted", user: req.user });
     } catch (error) {
         res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` ); 
     }
@@ -37,7 +50,7 @@ export const postUserRol = async ( req, res ) => {
         const rol = user.rol;
         rol == "user" ? user.rol = "premium" : user.rol = "user";
         await userModel.findByIdAndUpdate( uid, { rol: user.rol });
-        res.status ( 200 ).send ({ message: "Rol updated", user: req.user });
+        res.status ( 200 ).send ({ message: "Rol updated", user: user });
     } catch (error) {
         res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` ); 
     }

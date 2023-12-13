@@ -3,14 +3,13 @@ import supertest from "supertest";
 import mongoose from "mongoose";
 import config from "../config/config.js";
 import logger from "../utils/logger.js";
-import { generateToken } from "../utils/jwt.js";
 
 const expect = chai.expect;
 const requester = supertest ( "http://localhost:8080" );
 const user = JSON.parse ( config.realUser );
+const testUser = JSON.parse ( config.fakeUser );
 const product = JSON.parse ( config.fakeProduct );
-const cookieToken = generateToken ( user );
-const token = `jwtCookie=${ cookieToken }`;
+let token;
 await mongoose.connect ( config.mongoURL )
 .then (() => {
     logger.http ( `DB connected` );
@@ -25,6 +24,7 @@ describe ( "Integration test for e-commerce", () => {
                 password: user.password
             }
             const session = await requester.post ( "/api/session/login" ).send ( client );
+            token = session.header["set-cookie"][0];
             expect ( session.status ).to.equal ( 200 );
             expect ( session.body ).to.have.property ( "email" ).to.be.a ( "string" );
             expect ( session.body ).to.have.property ( "_id" ).to.be.a ( "string" );
@@ -61,7 +61,7 @@ describe ( "Integration test for e-commerce", () => {
             expect ( updatedProduct.title ).to.not.deep.equal ( prevProp );
             expect ( updatedProduct.body ).to.have.property ( "_id" ).to.be.a ("string");
         });
-        it ( "Endpoint test /api/products:id, expect to eliminate the product", async function () {
+        it ( "Endpoint test /api/products:id, expect to eliminate the product by the Id", async function () {
             const cleanProduct = await requester.delete ( `/api/products/${ prodId }` ).set ( "Cookie", token );
             expect ( cleanProduct.status ).to.equal ( 200 );
             expect ( cleanProduct.body ).to.have.property ( "thumbnails" ).to.be.a ( "array" );
@@ -87,6 +87,30 @@ describe ( "Integration test for e-commerce", () => {
             expect ( emptyCart.status ).to.equal ( 200 );
             expect ( emptyCart.body ).to.have.property ( "products" ).to.be.a ( "array" );
             expect ( emptyCart.body ).to.have.property ( "_id" ).to.be.a ("string");
+        });
+    });
+    describe ( "User test", () => {
+        let userId;
+        let userRol;
+        it ( "Endpoint test /api/users, expect to create a new user", async function () {
+            this.timeout(6000);
+            const newUser = await requester.post ( "/api/users" ).send ( testUser );
+            userId = newUser.body.user._id;
+            userRol = newUser.body.user.rol;
+            expect ( newUser.status ).to.equal ( 201 );
+            expect ( newUser.body ).to.have.property ( "message" ).to.be.a ( "string" ).to.be.deep.equal ( "User created" );
+            expect ( newUser.body.user ).to.have.property ( "rol" ).to.be.a ( "string" );
+        });
+        it ( "Endpoint test /api/users/premium/:uid, expect to change the current User rol between user and premium by the Id", async function () {
+            const changeRol = await requester.post ( `/api/users/premium/${ userId }` ).set ( "Cookie", token );
+            expect ( changeRol.status ).to.equal ( 200 );
+            expect ( changeRol.body.user ).to.have.property ( "rol" ).to.not.deep.equal ( userRol );
+            expect ( changeRol.body ).to.have.property ( "message" ).to.be.a ( "string" ).to.be.deep.equal ( "Rol updated" );
+        });
+        it ( "Endpoint test /api/users/:uid, expect to delete a user by the Id", async function () {
+            const deletedUser = await requester.delete ( `/api/users/${ userId }` ).set ( "Cookie", token );
+            expect ( deletedUser.status ).to.equal ( 200 );
+            expect ( deletedUser.body ).to.have.property ( "message" ).to.be.a ( "string" ).to.be.deep.equal ( "User deleted" );
         });
     });
 });
