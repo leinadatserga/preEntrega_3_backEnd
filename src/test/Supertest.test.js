@@ -93,8 +93,7 @@ describe ( "Integration test for e-commerce", () => {
         it ( "Endpoint test /api/carts/:cid, expect to empty a cart by Id", async function () {
             const emptyCart = await requester.delete ( `/api/carts/${ cartId }` ).set ( "Cookie", token );
             expect ( emptyCart.status ).to.equal ( 200 );
-            expect ( emptyCart.body ).to.have.property ( "products" ).to.be.a ( "array" );
-            expect ( emptyCart.body ).to.have.property ( "_id" ).to.be.a ("string");
+            expect ( emptyCart.body ).to.have.property ( "products" ).to.be.a ( "array" ).that.is.empty;
         });
     });
     describe ( "User test", () => {
