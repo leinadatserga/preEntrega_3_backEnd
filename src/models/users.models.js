@@ -35,6 +35,25 @@ const userSchema = new Schema ({
     owner: {
         type: String,
         default: "admin"
+    },
+    documents: {
+        type: [{
+            name: {
+                type: String,
+                required: true
+            },
+            reference: {
+                type: String,
+                required: true
+            }
+        }],
+        default: function () {
+            return []
+        }
+    },
+    last_connection: {
+        type: Date,
+        default: null
     }
 });
 userSchema.pre ( "save", async function ( next ) {
@@ -46,6 +65,11 @@ userSchema.pre ( "save", async function ( next ) {
             next ( error )
         }
     
-})
+});
+userSchema.methods.updateLastConnection = function () {
+    this.last_connection = new Date();
+    return this.save();
+};
+
 const userModel = model ( "users", userSchema );
 export default userModel;

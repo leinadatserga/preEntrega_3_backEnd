@@ -60,7 +60,8 @@ const initializePassport = () => {
                 return done ( null, false ); 
             }
             if ( validatePassword ( password, user.password )) {
-               return done ( null, user ) 
+                await user.updateLastConnection ();
+                return done ( null, user ) 
             }
             return done ( null, false )
         } catch (error) {

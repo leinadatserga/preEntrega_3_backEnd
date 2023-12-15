@@ -88,8 +88,7 @@ export const verifyRecoveryLink = async ( req, res ) => {
         }
     try {
         if ( verifiedLink && ( Date.now () - verifiedLink.timestamp ) <= 3600000 ) {
-            
-            const userNewPass = await userModel.findOneAndUpdate({ email: email }, { password: newPassword }, { new: true });
+            await userModel.findOneAndUpdate({ email: email }, { password: newPassword }, { new: true });
             delete tokenLink [ token ];
             res.status ( 200 ).send ({ message: "Recovery email verify, new password set confirmed" });
         } else {
@@ -97,5 +96,20 @@ export const verifyRecoveryLink = async ( req, res ) => {
         }
     } catch (error) {
         res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` );
+    }
+};
+export const postUserDocuments = async ( req, res ) => {
+    const { uid } = req.params;
+    try {
+        const user = await userModel.findById ( uid );
+        if ( !user ) {
+            res.status ( 400 ).send ( `${ CustomError.BadRequest ()}` );
+        }
+        const document = [{name: req.file.originalname, reference: req.file.destination}];
+        await userModel.findByIdAndUpdate ( uid, {documents: document});
+        user.save ();
+        res.status ( 200 ).send ({ message: "Document upload successfully", doc: req.file.path });
+    } catch (error) {
+        res.status ( 500 ).send ( `${ CustomError.InternalServerError ()}` ); 
     }
 };

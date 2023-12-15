@@ -1,3 +1,4 @@
+import userModel from '../models/users.models.js';
 import CustomError from '../services/errors/CustomError.js';
 import { generateToken } from '../utils/jwt.js';
 
@@ -35,8 +36,14 @@ export const getGithubSession = async ( req, res ) => {
     return res.status ( 200 ).send ( req.user );
 };
 export const getLogOut = async ( req, res ) => {
-    if ( req.session.login ) {
+    let userDat = {};
+    if ( req.session.passport ) {
+        userDat = req.session.passport.user;
+        const sessionUser = await userModel.findById ( userDat );
+        await sessionUser.updateLastConnection ();
         req.session.destroy ();
+        return res.status ( 200 ).send ({ result: "Logout done successfully" });
+    } else {
+        return res.status ( 400 ).send ({ result: "No session active" });
     }
-    return res.status ( 200 ).send ({ result: "Logout done" });
 };
