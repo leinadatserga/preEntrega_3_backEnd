@@ -45,7 +45,7 @@ export const postProduct = async ( req, res ) => {
         }
         const newProduct = await prodModel.create ({ title, description, code, price, status, stock, category, thumbnails });
         if ( newProduct ) {
-            return res.status ( 201 ).send ( newProduct );
+            return res.status ( 201 ).send ({ message: "New Product created", newProduct });
         }
         return res.status ( 404 ).send ( `${ CustomError.NotFound ()}` );
     } catch (error) {
@@ -60,9 +60,10 @@ export const putProduct = async ( req, res ) => {
     const { id } = req.params;
     const { title, description, code, price, status, stock, category, thumbnails } = req.body;
     try {
-        const updatedProduct = await prodModel.findByIdAndUpdate ( id, { title, description, code, price, status, stock, category, thumbnails });
-        if ( updatedProduct ) {
-            return res.status ( 200 ).send ( updatedProduct );
+        const productToUpdate = await prodModel.findByIdAndUpdate ( id, { title, description, code, price, status, stock, category, thumbnails });
+        const updatedProduct = await prodModel.findById ( id )
+        if ( productToUpdate ) {
+            return res.status ( 200 ).send ({ message: "Product updated successfully", updatedProduct });
         }
         return res.status ( 404 ).send ( `${ CustomError.NotFound ()}` ); 
     } catch (error) {
@@ -74,7 +75,7 @@ export const deleteProduct = async ( req, res ) => {
     try {
         const deletedProduct = await prodModel.findByIdAndDelete ( id );
         if ( deletedProduct ) {
-            return res.status ( 200 ).send ( deletedProduct );
+            return res.status ( 200 ).send ({ message: "Product deleted successfully", deletedProduct });
          }
          return res.status ( 404 ).send ( `${ CustomError.NotFound ()}` );
     } catch (error) {

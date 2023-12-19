@@ -57,14 +57,15 @@ const userSchema = new Schema ({
     }
 });
 userSchema.pre ( "save", async function ( next ) {
-   
+    if ( this.rol !== "admin" ) {
         try {
-            const newCart = await cartModel.create ({})
-            this.cart = newCart._id
+            const newCart = await cartModel.create ({});
+            this.cart = newCart._id;
         } catch (error) {
             next ( error )
         }
-    
+    }
+    next ();
 });
 userSchema.methods.updateLastConnection = function () {
     this.last_connection = new Date();
